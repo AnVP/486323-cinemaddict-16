@@ -1,4 +1,6 @@
-export const createCardTemplate =(film) => {
+import {createElement} from '../render';
+
+const createCardTemplate =(film) => {
   const addToWatchClassName = film.isAddToWatchList
     ? 'film-card__controls-item--active'
     : '';
@@ -28,3 +30,28 @@ export const createCardTemplate =(film) => {
           </div>
         </article>`;
 };
+
+export default class CardView {
+  #element = null;
+  #film = null;
+
+  constructor(film) {
+    this.#film = film;
+  }
+
+  get element() {
+    if (!this.#element) {
+      this.#element = createElement(this.template);
+    }
+
+    return this.#element;
+  }
+
+  get template() {
+    return createCardTemplate(this.#film);
+  }
+
+  removeElement() {
+    this.#element = null;
+  }
+}

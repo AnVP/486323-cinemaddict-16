@@ -1,6 +1,7 @@
 import {createTemplateFromArray} from '../utils/util';
+import {createElement} from '../render';
 
-export const createInfoTemplate =(film) => {
+const createInfoTemplate =(film) => {
   const addToWatchClassName = film.isAddToWatchList
     ? 'film-details__control-button--active'
     : '';
@@ -138,3 +139,28 @@ export const createInfoTemplate =(film) => {
 </section>
 `;
 };
+
+export default class InfoView {
+  #element = null;
+  #film = null;
+
+  constructor(film) {
+    this.#film = film;
+  }
+
+  get element() {
+    if (!this.#element) {
+      this.#element = createElement(this.template);
+    }
+
+    return this.#element;
+  }
+
+  get template() {
+    return createInfoTemplate(this.#film);
+  }
+
+  removeElement() {
+    this.#element = null;
+  }
+}
