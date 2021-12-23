@@ -1,4 +1,4 @@
-import {createElement} from '../render';
+import AbstractView from './abstract-view.js';
 
 const createCardListTemplate =() => (
   `<section class="films-list">
@@ -7,22 +7,8 @@ const createCardListTemplate =() => (
   </section>`
 );
 
-export default class CardListView {
-  #element = null;
-
-  get element() {
-    if (!this.#element) {
-      this.#element = createElement(this.template);
-    }
-
-    return this.#element;
-  }
-
+export default class CardListView extends AbstractView {
   get template() {
     return createCardListTemplate();
-  }
-
-  removeElement() {
-    this.#element = null;
   }
 }
