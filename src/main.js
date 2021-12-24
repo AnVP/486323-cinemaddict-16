@@ -1,4 +1,4 @@
-import {render, RenderPosition} from './render.js';
+import {render, RenderPosition, remove} from './utils/render.js';
 import SiteMenuView from './view/site-menu-view.js';
 import ButtonShowMoreView from './view/button-show-more-view';
 import CardListView from './view/card-list-view';
@@ -21,17 +21,17 @@ const films = Array.from({length: CARDS_COUNT}, generateFilm);
 const filters = generateFilter(films);
 
 const siteHeaderElement = document.querySelector('.header');
-render(siteHeaderElement, new ProfileView().element, RenderPosition.BEFOREEND);
+render(siteHeaderElement, new ProfileView(), RenderPosition.BEFOREEND);
 
 const siteMainElement = document.querySelector('.main');
-render(siteMainElement, new SiteMenuView(filters).element, RenderPosition.BEFOREEND);
-render(siteMainElement, new FiltersView().element, RenderPosition.BEFOREEND);
+render(siteMainElement, new SiteMenuView(filters), RenderPosition.BEFOREEND);
+render(siteMainElement, new FiltersView(), RenderPosition.BEFOREEND);
 
-render(siteMainElement, new FilmsView().element, RenderPosition.BEFOREEND);
+render(siteMainElement, new FilmsView(), RenderPosition.BEFOREEND);
 
 if (films.length) {
   const filmsElement = siteMainElement.querySelector('.films');
-  render(filmsElement, new CardListView().element, RenderPosition.BEFOREEND);
+  render(filmsElement, new CardListView(), RenderPosition.BEFOREEND);
 
   const cardListElement = filmsElement.querySelector('.films-list');
   const cardContainerElement = cardListElement.querySelector('.films-list__container');
@@ -50,18 +50,18 @@ if (films.length) {
         document.removeEventListener('keydown', onEscKeyDown);
       }
     };
-    cardComponent.element.querySelector('.film-card__link').addEventListener('click', () => {
-      render(siteFooterTemplate, infoComponent.element, RenderPosition.AFTEREND);
+    cardComponent.setClickHandler(() => {
+      render(siteFooterTemplate, infoComponent, RenderPosition.AFTEREND);
       document.body.classList.add('hide-overflow');
       document.addEventListener('keydown', onEscKeyDown);
     });
-    infoComponent.element.querySelector('.film-details__close-btn').addEventListener('click', () => {
+    infoComponent.setClickHandler(() => {
       removePopup();
       document.body.classList.remove('hide-overflow');
       document.removeEventListener('keydown', onEscKeyDown);
     });
 
-    render(container, cardComponent.element, RenderPosition.BEFOREEND);
+    render(container, cardComponent, RenderPosition.BEFOREEND);
   };
 
   for (let i = 0; i < Math.min(films.length, CARDS_COUNT_PER_STEP); i++) {
@@ -71,10 +71,9 @@ if (films.length) {
   if (films.length > CARDS_COUNT_PER_STEP) {
     let renderedTaskCount = CARDS_COUNT_PER_STEP;
     const loadMoreButton = new ButtonShowMoreView();
-    render(cardListElement, loadMoreButton.element, RenderPosition.BEFOREEND);
+    render(cardListElement, loadMoreButton, RenderPosition.BEFOREEND);
 
-    loadMoreButton.element.addEventListener('click', (evt) => {
-      evt.preventDefault();
+    loadMoreButton.setClickHandler(() => {
       films
         .slice(renderedTaskCount, renderedTaskCount + CARDS_COUNT_PER_STEP)
         .forEach((film) => renderFilm(cardContainerElement, film));
@@ -82,13 +81,12 @@ if (films.length) {
       renderedTaskCount += CARDS_COUNT_PER_STEP;
 
       if (renderedTaskCount >= films.length) {
-        loadMoreButton.element.remove();
-        loadMoreButton.removeElement();
+        remove(loadMoreButton);
       }
     });
   }
 
-  render(filmsElement, new TopRatedListView().element, RenderPosition.BEFOREEND);
+  render(filmsElement, new TopRatedListView(), RenderPosition.BEFOREEND);
   const topRatedListElement = filmsElement.querySelector('.films-list--extra');
   const topRatedContainerElement = topRatedListElement.querySelector('.films-list__container');
 
@@ -104,5 +102,5 @@ if (films.length) {
     renderFilm(mostCommentedContainerElement, films[i]);
   }
 } else {
-  render(siteMainElement, new NoTaskView().element, RenderPosition.BEFOREEND);
+  render(siteMainElement, new NoTaskView(), RenderPosition.BEFOREEND);
 }
