@@ -1,4 +1,5 @@
 import dayjs from 'dayjs';
+import {nanoid} from 'nanoid';
 import {
   TITLES,
   DESCRIPTIONS,
@@ -50,6 +51,7 @@ const generateGenres = (genre) => {
 
 export const generateFilm = () => (
   {
+    id: nanoid(),
     poster: getRandomArrayElement(POSTERS),
     title: getRandomArrayElement(TITLES),
     origin: getRandomArrayElement(ORIGIN_TITLES),
@@ -68,3 +70,27 @@ export const generateFilm = () => (
     isWatched: Boolean(getRandomNumber(0, 1)),
     isFavorite: Boolean(getRandomNumber(0, 1)),
   });
+
+// Функция помещает задачи без даты в конце списка,
+// возвращая нужный вес для колбэка sort
+const getWeightForNullDate = (dateA, dateB) => {
+  if (dateA === null && dateB === null) {
+    return 0;
+  }
+
+  if (dateA === null) {
+    return 1;
+  }
+
+  if (dateB === null) {
+    return -1;
+  }
+
+  return null;
+};
+
+export const sortDateUp = (elA, elB) => {
+  const weight = getWeightForNullDate(elA.dueDate, elB.dueDate);
+
+  return weight ?? dayjs(elA.dueDate).diff(dayjs(elB.dueDate));
+};

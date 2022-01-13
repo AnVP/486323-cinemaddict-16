@@ -90,6 +90,12 @@ const EMOJIES = [
   'angry',
 ];
 
+const SortType = {
+  DEFAULT: 'default',
+  DATE: 'date',
+  RATING: 'rating',
+};
+
 export {
   TITLES,
   DESCRIPTIONS,
@@ -102,5 +108,6 @@ export {
   PEOPLE,
   GENRES,
   EMOJIES,
-  AGE
+  AGE,
+  SortType
 };
