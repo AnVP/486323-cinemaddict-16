@@ -162,33 +162,12 @@ export default class InfoView extends AbstractView {
     this._callback.click();
   }
 
-  setFavoriteClickHandler = (callback) => {
-    this._callback.favoriteClick = callback;
-    this.element.querySelector('.film-details__control-button--favorite').addEventListener('click', this.#favoriteClickHandler);
-  }
+  #buttonsClickHandler = (value) => () => this._callback.buttonsClick(value);
 
-  #favoriteClickHandler = (evt) => {
-    evt.preventDefault();
-    this._callback.favoriteClick();
-  }
-
-  setAddToWatchClickHandler = (callback) => {
-    this._callback.AddToWatchClick = callback;
-    this.element.querySelector('.film-details__control-button--watchlist').addEventListener('click', this.#addToWatchClickHandler);
-  }
-
-  #addToWatchClickHandler = (evt) => {
-    evt.preventDefault();
-    this._callback.AddToWatchClick();
-  }
-
-  setWatchedClickHandler = (callback) => {
-    this._callback.WatchedClick = callback;
-    this.element.querySelector('.film-details__control-button--watched').addEventListener('click', this.#watchedClickHandler);
-  }
-
-  #watchedClickHandler = (evt) => {
-    evt.preventDefault();
-    this._callback.WatchedClick();
+  setButtonsClickHandler = (callback) => {
+    this._callback.buttonsClick = callback;
+    this.element.querySelector('.film-details__control-button--watchlist').addEventListener('click', this.#buttonsClickHandler('watchlist'));
+    this.element.querySelector('.film-details__control-button--watched').addEventListener('click', this.#buttonsClickHandler('watched'));
+    this.element.querySelector('.film-details__control-button--favorite').addEventListener('click', this.#buttonsClickHandler('favorite'));
   }
 }

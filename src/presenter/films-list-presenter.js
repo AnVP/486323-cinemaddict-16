@@ -148,7 +148,6 @@ export default class FilmsListPresenter {
     if (this.#currentSortType === sortType) {
       return;
     }
-
     this.#sortFilms(sortType);
     this.#clearFilmsList();
     this.#renderFilmsList();
