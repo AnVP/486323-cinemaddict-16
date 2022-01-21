@@ -96,6 +96,12 @@ const SortType = {
   RATING: 'rating',
 };
 
+const ButtonStatus = {
+  WATCHLIST: 'watchlist',
+  WATCHED: 'watched',
+  FAVORITE: 'favorite'
+};
+
 export {
   TITLES,
   DESCRIPTIONS,
@@ -109,5 +115,6 @@ export {
   GENRES,
   EMOJIES,
   AGE,
-  SortType
+  SortType,
+  ButtonStatus
 };

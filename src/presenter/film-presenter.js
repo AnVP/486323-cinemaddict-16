@@ -2,6 +2,7 @@ import CardView from '../view/card-view';
 import InfoView from '../view/info-view';
 import {remove, render, RenderPosition} from '../utils/render';
 import {replace} from '../utils/util';
+import {ButtonStatus} from '../utils/constants';
 
 export default class FilmPresenter {
   #container = null;
@@ -48,6 +49,7 @@ export default class FilmPresenter {
   }
 
   #removePopup = () => {
+    this.#infoComponent.reset(this.#film);
     this.#infoComponent.element.remove();
   };
 
@@ -84,13 +86,13 @@ export default class FilmPresenter {
 
   #handleAddToButtonsControlClick = (value) => {
     switch (value) {
-      case 'watchlist':
+      case ButtonStatus.WATCHLIST:
         this.#changeData({...this.#film, isAddToWatchList: !this.#film.isAddToWatchList});
         break;
-      case 'watched':
+      case ButtonStatus.WATCHED:
         this.#changeData({...this.#film, isWatched: !this.#film.isWatched});
         break;
-      case 'favorite':
+      case ButtonStatus.FAVORITE:
         this.#changeData({...this.#film, isFavorite: !this.#film.isFavorite});
         break;
     }

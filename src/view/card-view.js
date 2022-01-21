@@ -1,4 +1,5 @@
 import AbstractView from './abstract-view.js';
+import {ButtonStatus} from '../utils/constants';
 
 const createCardTemplate =(film) => {
   const addToWatchClassName = film.isAddToWatchList
@@ -57,8 +58,8 @@ export default class CardView extends AbstractView {
 
   setButtonsClickHandler = (callback) => {
     this._callback.buttonsClick = callback;
-    this.element.querySelector('.film-card__controls-item--add-to-watchlist').addEventListener('click', this.#buttonsClickHandler('watchlist'));
-    this.element.querySelector('.film-card__controls-item--mark-as-watched').addEventListener('click', this.#buttonsClickHandler('watched'));
-    this.element.querySelector('.film-card__controls-item--favorite').addEventListener('click', this.#buttonsClickHandler('favorite'));
+    this.element.querySelector('.film-card__controls-item--add-to-watchlist').addEventListener('click', this.#buttonsClickHandler(ButtonStatus.WATCHLIST));
+    this.element.querySelector('.film-card__controls-item--mark-as-watched').addEventListener('click', this.#buttonsClickHandler(ButtonStatus.WATCHED));
+    this.element.querySelector('.film-card__controls-item--favorite').addEventListener('click', this.#buttonsClickHandler(ButtonStatus.FAVORITE));
   }
 }
