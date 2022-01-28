@@ -72,6 +72,12 @@ body {
   overflow: hidden;
 }
 
+.hide-overflow .header,
+.hide-overflow .main,
+.hide-overflow .footer {
+  pointer-events: none;
+}
+
 a:link {
   opacity: 1;
   text-decoration: none;

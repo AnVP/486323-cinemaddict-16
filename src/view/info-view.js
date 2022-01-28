@@ -1,3 +1,5 @@
+import {nanoid} from 'nanoid';
+import he from 'he';
 import {createTemplateFromArray} from '../utils/util';
 import SmartView from './smart-view.js';
 import {ButtonStatus, EMOJIES} from '../utils/constants';
@@ -14,7 +16,7 @@ const createInfoTemplate =(data) => {
     ? 'film-details__control-button--active'
     : '';
   const createGenreTemplate = (genre) => `<span class="film-details__genre">${genre}</span>`;
-  const createCommentTemplate = (comment) => `<li class="film-details__comment">
+  const createCommentTemplate = (comment) => `<li class="film-details__comment"">
             <span class="film-details__comment-emoji">
               <img src="./images/emoji/${comment.emoji}.png" width="55" height="55" alt="emoji-smile">
             </span>
@@ -23,7 +25,7 @@ const createInfoTemplate =(data) => {
               <p class="film-details__comment-info">
                 <span class="film-details__comment-author">${comment.author}</span>
                 <span class="film-details__comment-day">${comment.date}</span>
-                <button class="film-details__comment-delete">Delete</button>
+                <button data-comment="${comment.id}" class="film-details__comment-delete">Delete</button>
               </p>
             </div>
           </li>`;
@@ -112,10 +114,13 @@ const createInfoTemplate =(data) => {
         </ul>
 
         <div class="film-details__new-comment">
-          <div class="film-details__add-emoji-label">${isEmoji}</div>
+          <div class="film-details__add-emoji-label">
+          ${isEmoji !== '' ? `<img src="images/emoji/${isEmoji}.png" width="55" height="55" alt="emoji-${isEmoji}">` : ''}
+
+</div>
 
           <label class="film-details__comment-label">
-            <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment">${message}</textarea>
+            <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment">${he.encode(message)}</textarea>
           </label>
 
           <div class="film-details__emoji-list">
@@ -130,9 +135,10 @@ const createInfoTemplate =(data) => {
 };
 
 export default class InfoView extends SmartView {
-  constructor(film) {
+  constructor(film, comments) {
     super();
     this._data = InfoView.parseFilmToData(film);
+    this._comments = [...comments];
     this.#setInnerHandlers();
   }
 
@@ -160,6 +166,20 @@ export default class InfoView extends SmartView {
     this.element.querySelector('.film-details__control-button--favorite').addEventListener('click', this.#buttonsClickHandler(ButtonStatus.FAVORITE));
   }
 
+  setCommentDeleteHandler = (callback) => {
+    this._callback.deleteClick = callback;
+    this.element.querySelectorAll('.film-details__comment-delete').forEach((item) => item.addEventListener('click', this.#commentDeleteHandler));
+
+  }
+
+  #commentDeleteHandler = (evt) => {
+    evt.preventDefault();
+    if (evt.target.dataset.comment) {
+      const commentId = evt.target.dataset.comment;
+      this._callback.deleteClick(commentId);
+    }
+  }
+
   reset = (film) => {
     this.updateData(
       InfoView.parseFilmToData(film),
@@ -171,19 +191,20 @@ export default class InfoView extends SmartView {
     this.#setInnerHandlers();
     this.setButtonsClickHandler(this._callback.buttonsClick);
     this.setClickHandler(this._callback.click);
+    this.setCommentDeleteHandler(this._callback.deleteClick);
+    this.setCommentFormSubmit(this._callback.formSubmit);
   }
 
   #setInnerHandlers = () => {
     this.element.querySelectorAll('.film-details__emoji-item').forEach((emoji) => emoji.addEventListener('change', this.#emojiChangeHandler));
     this.element.querySelector('.film-details__comment-input')
       .addEventListener('input', this.#messageInputHandler);
-
   }
 
   #emojiChangeHandler = (evt) => {
     evt.preventDefault();
     this.updateData({
-      isEmoji: `<img src="./images/emoji/${evt.target.value}.png" width="55" height="55" alt="emoji-${evt.target.value}">`,
+      isEmoji: evt.target.value,
       isEmojiChecked: evt.target.id,
     });
   }
@@ -193,6 +214,27 @@ export default class InfoView extends SmartView {
     this.updateData({
       message: evt.target.value,
     }, true);
+  }
+
+  setCommentFormSubmit = (callback) => {
+    this._callback.formSubmit = callback;
+    this.element.querySelector('.film-details__comment-input').addEventListener('keydown', this.#commentFormKeydownHandler);
+  }
+
+  #commentFormKeydownHandler = (evt) => {
+    if (evt.key === 'Enter') {
+      if (!this._data.isEmoji || !this._data.message) {
+        return;
+      }
+      const newComment = {
+        id: nanoid(),
+        text: this._data.message,
+        emoji: this._data.isEmoji,
+        author: 'Автор',
+        date: new Date(),
+      };
+      this._callback.formSubmit(newComment);
+    }
   }
 
   static parseFilmToData = (film) => ({...film,

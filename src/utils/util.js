@@ -47,15 +47,9 @@ const replace = (newElement, oldElement) => {
   parent.replaceChild(newChild, oldChild);
 };
 
-const updateItem = (items, update) => {
-  const index = items.findIndex((item) => item.id === update.id);
-
-  if (index === -1) {
-    return items;
-  }
-
-  return [...items.slice(0, index), update, ...items.slice(index + 1)];
-};
+const sortRating = (filmA, filmB) => filmB.rating - filmA.rating;
+const sortComments = (filmA, filmB) => filmB.comments.length - filmA.comments.length;
+const sortDate = (filmA, filmB) => filmB.year - filmA.year;
 
 export {
   getRandomNumber,
@@ -64,5 +58,7 @@ export {
   createTemplateFromArray,
   addUpperCaseFirst,
   replace,
-  updateItem
+  sortRating,
+  sortComments,
+  sortDate
 };
