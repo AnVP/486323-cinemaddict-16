@@ -17,6 +17,7 @@ export default class FilmPresenter {
 
   #film = null;
   #currentFilter = null;
+  #isOpen = false;
 
   constructor(container, changeData, comments, currentFilter) {
     this.#container = container;
@@ -50,6 +51,7 @@ export default class FilmPresenter {
       replace(this.#cardComponent, prevFilmCardComponent);
     }
 
+    // this.#initPopup(this.#film);
     if (document.body.contains(prevFilmPopupComponent.element)) {
       const scrollPosition = prevFilmPopupComponent.element.scrollTop;
       replace(this.#infoComponent, prevFilmPopupComponent);
@@ -57,10 +59,11 @@ export default class FilmPresenter {
     }
 
     remove(prevFilmCardComponent);
-    remove(prevFilmPopupComponent);
+    // remove(prevFilmPopupComponent);
   }
 
   #removePopup = () => {
+    this.#isOpen = false;
     this.#infoComponent.reset(this.#film);
     this.#infoComponent.element.remove();
     document.body.classList.remove('hide-overflow');
@@ -76,16 +79,30 @@ export default class FilmPresenter {
 
   #closePopup = () => {
     this.#removePopup();
-    // document.body.classList.remove('hide-overflow');
     document.removeEventListener('keydown', this.#onEscKeyDown);
   }
 
   #openPopup = () => {
+    this.#isOpen = true;
     this.#infoComponent = this.#infoComponent || new InfoView(this.#film);
     document.body.appendChild(this.#infoComponent.element);
     document.body.classList.add('hide-overflow');
     document.addEventListener('keydown', this.#onEscKeyDown);
   }
+
+  #initPopup = (film) => {
+    this.#film = film;
+    const prevFilmPopupComponent = this.#infoComponent;
+    this.#infoComponent = new InfoView(film, this.#commentsModel.comments);
+    this.#setInfoPopupComponentHandlers();
+    if (document.body.contains(prevFilmPopupComponent.element)) {
+      const scrollPosition = prevFilmPopupComponent.element.scrollTop;
+      replace(this.#infoComponent, prevFilmPopupComponent);
+      this.#infoComponent.element.scrollTop = scrollPosition;
+      this.#setInfoPopupComponentHandlers();
+    }
+    remove(prevFilmPopupComponent);
+  };
 
   #setCardComponentHandlers = () => {
     this.#cardComponent.setClickHandler(this.#openPopup);
@@ -119,6 +136,11 @@ export default class FilmPresenter {
           this.#currentFilter !== FilterType.FAVORITES ? UpdateType.PATCH : UpdateType.MINOR,
           {...this.#film, isFavorite: !this.#film.isFavorite});
         break;
+    }
+    if (this.#isOpen) {
+      this.#removePopup();
+      this.#initPopup(this.#film);
+      this.#openPopup();
     }
   }
 
@@ -158,6 +180,8 @@ export default class FilmPresenter {
 
   destroy = () => {
     remove(this.#cardComponent);
-    remove(this.#infoComponent);
+    if (!this.#isOpen) {
+      remove(this.#infoComponent);
+    }
   }
 }

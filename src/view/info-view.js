@@ -3,6 +3,7 @@ import he from 'he';
 import {createTemplateFromArray} from '../utils/util';
 import SmartView from './smart-view.js';
 import {ButtonStatus, EMOJIES} from '../utils/constants';
+import dayjs from 'dayjs';
 
 const createInfoTemplate =(data) => {
   const { isEmojiChecked, isEmoji, message } = data;
@@ -231,7 +232,7 @@ export default class InfoView extends SmartView {
         text: this._data.message,
         emoji: this._data.isEmoji,
         author: 'Автор',
-        date: new Date(),
+        date: dayjs(Date.now()).format('YYYY/MM/DD HH:mm'),
       };
       this._callback.formSubmit(newComment);
     }

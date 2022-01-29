@@ -207,4 +207,9 @@ export default class FilmsListPresenter {
     render(this.#filmsContainer, this.#sortComponent, RenderPosition.BEFOREEND);
     this.#sortComponent.setSortTypeChangeHandler(this.#handleSortTypeChange);
   }
+
+  destroy = () => {
+    this.#clearBoard({resetRenderedFilmCount: true, resetSortType: true});
+    remove(this.#filmsComponent);
+  }
 }

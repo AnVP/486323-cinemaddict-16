@@ -121,6 +121,11 @@ export const FilterType = {
   FAVORITES: 'favoritess',
 };
 
+export const MenuItem = {
+  FILMS: 'FILMS',
+  STATISTICS: 'STATISTICS',
+};
+
 export {
   TITLES,
   DESCRIPTIONS,
