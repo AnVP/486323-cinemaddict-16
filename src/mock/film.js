@@ -5,7 +5,6 @@ import {
   DESCRIPTIONS,
   ORIGIN_TITLES,
   POSTERS,
-  DURATIONS,
   COUNTRY,
   PEOPLE,
   GENRES,
@@ -26,6 +25,7 @@ const generateDate = () => {
 };
 
 const generateComment = () => ({
+  id: nanoid(),
   text: getRandomArrayElement(COMMENTS_TEXT),
   emoji: getRandomArrayElement(EMOJIES),
   author: getRandomArrayElement(COMMENTS_NAMES),
@@ -59,7 +59,7 @@ export const generateFilm = () => (
     comments: generateCommentList(),
     rating: `${getRandomNumber(0, 9)}.${getRandomNumber(0, 9)}`,
     year: getRandomNumber(1920, 1970),
-    duration: getRandomArrayElement(DURATIONS),
+    duration: getRandomNumber(20, 220),
     age: getRandomArrayElement(AGE),
     genre: generateGenres(GENRES),
     director: getRandomArrayElement(PEOPLE),
@@ -69,6 +69,7 @@ export const generateFilm = () => (
     isAddToWatchList: Boolean(getRandomNumber(0, 1)),
     isWatched: Boolean(getRandomNumber(0, 1)),
     isFavorite: Boolean(getRandomNumber(0, 1)),
+    watchedDate: generateDate(),
   });
 
 // Функция помещает задачи без даты в конце списка,
