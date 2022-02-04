@@ -2,8 +2,17 @@ import CardView from '../view/card-view';
 import InfoView from '../view/info-view';
 import {remove, render, RenderPosition} from '../utils/render';
 import {replace} from '../utils/util';
-import {ButtonStatus, FilterType, UpdateType, UserAction} from '../utils/constants';
+import {
+  AUTHORIZATION,
+  ButtonStatus,
+  END_POINT, FilterType, Key,
+  Mode,
+  State,
+  UpdateType,
+  UserAction
+} from '../utils/constants';
 import CommentsModel from '../model/comments-model';
+import ApiService from '../api-service';
 
 export default class FilmPresenter {
   #container = null;
@@ -14,19 +23,20 @@ export default class FilmPresenter {
   #changeData = null;
 
   #commentsModel = null;
+  #api = null;
 
   #film = null;
   #currentFilter = null;
-  #isOpen = false;
+  #mode = Mode.DEFAULT;
 
-  constructor(container, changeData, comments, currentFilter) {
+  constructor(container, changeData, currentFilter) {
     this.#container = container;
     this.#changeData = changeData;
     this.#siteFooterTemplate = document.querySelector('.footer');
     this.#currentFilter = currentFilter;
+    this.#api = new ApiService(END_POINT, AUTHORIZATION);
 
-    this.#commentsModel = new CommentsModel();
-    this.#commentsModel.comments = comments;
+    this.#commentsModel = new CommentsModel(this.#api);
     this.#commentsModel.addObserver(this.#handleModelEvent);
 
   }
@@ -42,7 +52,7 @@ export default class FilmPresenter {
     this.#setCardComponentHandlers();
     this.#setInfoPopupComponentHandlers();
 
-    if (prevFilmCardComponent === null || prevFilmPopupComponent === null) {
+    if (prevFilmCardComponent === null) {
       render(this.#container, this.#cardComponent, RenderPosition.BEFOREEND);
       return;
     }
@@ -51,26 +61,56 @@ export default class FilmPresenter {
       replace(this.#cardComponent, prevFilmCardComponent);
     }
 
-    // this.#initPopup(this.#film);
     if (document.body.contains(prevFilmPopupComponent.element)) {
       const scrollPosition = prevFilmPopupComponent.element.scrollTop;
       replace(this.#infoComponent, prevFilmPopupComponent);
       this.#infoComponent.element.scrollTop = scrollPosition;
+      remove(prevFilmPopupComponent);
     }
 
     remove(prevFilmCardComponent);
-    // remove(prevFilmPopupComponent);
+    remove(prevFilmPopupComponent);
+  }
+
+  setViewState = (state) => {
+    if (this.#mode === Mode.DEFAULT) {
+      return;
+    }
+
+    const resetFormState = () => {
+      this.#infoComponent.updateData({
+        isDisabled: false,
+        isDeleting: false,
+      });
+    };
+
+    switch (state) {
+      case State.SAVING:
+        this.#infoComponent.updateData({
+          isDisabled: true,
+        });
+        break;
+      case State.DELETING:
+        this.#infoComponent.updateData({
+          isDisabled: true,
+          isDeleting: true,
+        });
+        break;
+      case State.ABORTING:
+        this.#infoComponent.shake(resetFormState);
+        break;
+    }
   }
 
   #removePopup = () => {
-    this.#isOpen = false;
+    this.#mode = Mode.DEFAULT;
     this.#infoComponent.reset(this.#film);
     this.#infoComponent.element.remove();
     document.body.classList.remove('hide-overflow');
   };
 
   #onEscKeyDown = (evt) => {
-    if (evt.key === 'Escape' || evt.key === 'Esc') {
+    if (evt.key === Key.ESCAPE || evt.key === Key.ESC) {
       evt.preventDefault();
       this.#removePopup();
       document.removeEventListener('keydown', this.#onEscKeyDown);
@@ -80,29 +120,18 @@ export default class FilmPresenter {
   #closePopup = () => {
     this.#removePopup();
     document.removeEventListener('keydown', this.#onEscKeyDown);
+    this.#handleModelEvent(UserAction.CLOSE_POPUP);
   }
 
-  #openPopup = () => {
-    this.#isOpen = true;
-    this.#infoComponent = this.#infoComponent || new InfoView(this.#film);
+  #openPopup = async () => {
+    this.#mode = Mode.POPUP;
+    await this.#commentsModel.init(this.#film.id);
+    this.#infoComponent = new InfoView(this.#film, this.#commentsModel.comments);
+    this.#setInfoPopupComponentHandlers();
     document.body.appendChild(this.#infoComponent.element);
     document.body.classList.add('hide-overflow');
     document.addEventListener('keydown', this.#onEscKeyDown);
   }
-
-  #initPopup = (film) => {
-    this.#film = film;
-    const prevFilmPopupComponent = this.#infoComponent;
-    this.#infoComponent = new InfoView(film, this.#commentsModel.comments);
-    this.#setInfoPopupComponentHandlers();
-    if (document.body.contains(prevFilmPopupComponent.element)) {
-      const scrollPosition = prevFilmPopupComponent.element.scrollTop;
-      replace(this.#infoComponent, prevFilmPopupComponent);
-      this.#infoComponent.element.scrollTop = scrollPosition;
-      this.#setInfoPopupComponentHandlers();
-    }
-    remove(prevFilmPopupComponent);
-  };
 
   #setCardComponentHandlers = () => {
     this.#cardComponent.setClickHandler(this.#openPopup);
@@ -133,24 +162,29 @@ export default class FilmPresenter {
       case ButtonStatus.FAVORITE:
         this.#changeData(
           UserAction.UPDATE_FILM,
-          this.#currentFilter !== FilterType.FAVORITES ? UpdateType.PATCH : UpdateType.MINOR,
+          (this.#currentFilter !== FilterType.FAVORITES) || (this.#mode === Mode.POPUP) ? UpdateType.PATCH : UpdateType.MINOR,
           {...this.#film, isFavorite: !this.#film.isFavorite});
         break;
     }
-    if (this.#isOpen) {
-      this.#removePopup();
-      this.#initPopup(this.#film);
-      this.#openPopup();
-    }
   }
 
-  #handleViewAction = (actionType, update) => {
+  #handleViewAction = async (actionType, update) => {
     switch (actionType) {
       case UserAction.ADD_COMMENT:
-        this.#commentsModel.addComment(actionType, update);
+        this.setViewState(State.SAVING);
+        try {
+          await this.#commentsModel.addComment(actionType, this.#film.id, update);
+        } catch (err) {
+          this.setViewState(State.ABORTING, update);
+        }
         break;
       case UserAction.DELETE_COMMENT:
-        this.#commentsModel.deleteComment(actionType, update);
+        this.setViewState(State.DELETING, update);
+        try {
+          await this.#commentsModel.deleteComment(actionType, update);
+        } catch (err) {
+          this.setViewState(State.ABORTING);
+        }
         break;
     }
   }
@@ -160,13 +194,19 @@ export default class FilmPresenter {
       case UserAction.ADD_COMMENT:
         this.#changeData(
           UserAction.ADD_COMMENT, UpdateType.PATCH,
-          {...this.#film, comments: this.#film.comments.concat([data])});
+          { ...this.#film, comments: data.comments.map((comment) => comment.id) });
         break;
       case UserAction.DELETE_COMMENT:
         this.#changeData(
           UserAction.DELETE_COMMENT, UpdateType.PATCH,
           { ...this.#film, comments: this.#film.comments.filter((comment) => comment.id !== data) });
         break;
+      case UserAction.CLOSE_POPUP:
+        if (this.#currentFilter !== FilterType.ALL) {
+          this.#changeData(
+            UserAction.CLOSE_POPUP, UpdateType.MINOR,
+            { ...this.#film });
+        }
     }
   }
 
@@ -180,8 +220,8 @@ export default class FilmPresenter {
 
   destroy = () => {
     remove(this.#cardComponent);
-    if (!this.#isOpen) {
-      remove(this.#infoComponent);
+    if (this.#mode === Mode.POPUP) {
+      this.#removePopup();
     }
   }
 }

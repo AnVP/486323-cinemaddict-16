@@ -1,37 +1,65 @@
 import AbstractObservable from '../utils/abstract-observable.js';
 
 export default class CommentsModel extends AbstractObservable {
-  #comments = [];
+  #comments = new Map;
+  #apiService = null;
 
-  set comments(comments) {
-    this.#comments = [...comments];
+  constructor(apiService) {
+    super();
+    this.#apiService = apiService;
   }
 
   get comments() {
     return this.#comments;
   }
 
-  addComment = (actionType, update) => {
-    this.#comments = [
-      ...this.#comments,
-      update
-    ];
-
-    this._notify(actionType, update);
+  init = async (filmId) => {
+    try {
+      const comments = await this.#apiService.getComments(filmId);
+      this.#comments = comments.map(this.#adaptToClient);
+    } catch(err) {
+      this.#comments = [];
+    }
   }
 
-  deleteComment = (actionType, update) => {
+  addComment = async (actionType, filmId, update) => {
+    try {
+      const response = await this.#apiService.addComment(filmId, update);
+      // const newComment = this.#adaptToClient(response);
+      this.#comments = response.comments.map(this.#adaptToClient);
+      this._notify(actionType, response);
+    } catch(err) {
+      throw new Error('Can\'t add comment');
+    }
+  }
+
+  deleteComment = async (actionType, update) => {
     const index = this.#comments.findIndex((comment) => comment.id === update);
 
     if (index === -1) {
       throw new Error('Can\'t delete unexisting comment');
     }
 
-    this.#comments = [
-      ...this.#comments.slice(0, index),
-      ...this.#comments.slice(index + 1),
-    ];
+    try {
+      await this.#apiService.deleteComment(update);
+      this.#comments = [
+        ...this.#comments.slice(0, index),
+        ...this.#comments.slice(index + 1),
+      ];
+      this._notify(actionType, update);
+    } catch(err) {
+      throw new Error('Can\'t delete comment');
+    }
+  }
 
-    this._notify(actionType, update);
+  #adaptToClient = (comment) => {
+    const adaptedComment = {...comment,
+      'text': comment.comment,
+      'emoji': comment.emotion,
+    };
+
+    delete adaptedComment.comment;
+    delete adaptedComment.emotion;
+    return adaptedComment;
   }
 }

@@ -11,6 +11,24 @@ export const StatisticFilterType = {
   YEAR: 'year'
 };
 
+export const TitleRank = {
+  NOVICE: 'Novice',
+  FAN: 'Fan',
+  MOVIE_BUFF: 'Movie Buff',
+};
+
+export const RankRating = {
+  NOVICE: {
+    MIN: 1,
+    MAX: 10
+  },
+  FAN: {
+    MIN: 11,
+    MAX: 20
+  },
+  MOVIE_BUFF: 21,
+};
+
 const StatsTime = {
   TODAY: dayjs().toDate(),
   WEEK: dayjs().subtract(1, 'week').toDate(),
@@ -54,4 +72,18 @@ export const getTopGenre = (films) => {
   const genres = getGenres(films);
   const topGenre = Object.entries(genres).sort((a, b) => b[1] - a[1])[0][0];
   return topGenre;
+};
+
+export const getRank = (films) => {
+  const count = films.length;
+  if (!films.length) {
+    return;
+  }
+  if (count >= RankRating.NOVICE.MIN && count <= RankRating.NOVICE.MAX) {
+    return TitleRank.NOVICE;
+  } else if (count >= RankRating.FAN.MIN && count <= RankRating.FAN.MAX) {
+    return TitleRank.FAN;
+  } else {
+    return TitleRank.MOVIE_BUFF;
+  }
 };

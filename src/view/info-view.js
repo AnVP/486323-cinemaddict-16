@@ -1,12 +1,13 @@
-import {nanoid} from 'nanoid';
 import he from 'he';
 import {createTemplateFromArray} from '../utils/util';
 import SmartView from './smart-view.js';
-import {ButtonStatus, EMOJIES} from '../utils/constants';
+import {ButtonStatus, EMOJIES, Key} from '../utils/constants';
 import dayjs from 'dayjs';
+import duration from 'dayjs/plugin/duration.js';
+dayjs.extend(duration);
 
-const createInfoTemplate =(data) => {
-  const { isEmojiChecked, isEmoji, message } = data;
+const createInfoTemplate =(data, comments) => {
+  const { isEmojiChecked, isEmoji, message, isDisabled} = data;
   const addToWatchClassName = data.isAddToWatchList
     ? 'film-details__control-button--active'
     : '';
@@ -25,11 +26,13 @@ const createInfoTemplate =(data) => {
               <p class="film-details__comment-text">${comment.text}</p>
               <p class="film-details__comment-info">
                 <span class="film-details__comment-author">${comment.author}</span>
-                <span class="film-details__comment-day">${comment.date}</span>
-                <button data-comment="${comment.id}" class="film-details__comment-delete">Delete</button>
+                <span class="film-details__comment-day">${dayjs(comment.date).format('DD MMMM YYYY HH:mm')}</span>
+                <button data-comment="${comment.id}" class="film-details__comment-delete" ${isDisabled ? 'disabled' : ''}>Delete</button>
               </p>
             </div>
           </li>`;
+
+  const createCommentsListTemplate = () => comments.map((comment) => createCommentTemplate(comment)).join('');
 
   const createEmojiTemplate = (emoji) => `<input class="film-details__emoji-item visually-hidden" name="comment-${emoji}" type="radio" id="emoji-${emoji}" value="${emoji}" ${isEmojiChecked === emoji ? 'checked' : ''}>
   <label class="film-details__emoji-label" for="emoji-${emoji}">
@@ -44,23 +47,19 @@ const createInfoTemplate =(data) => {
       </div>
       <div class="film-details__info-wrap">
         <div class="film-details__poster">
-          <img class="film-details__poster-img" src="./images/posters/${data.poster}" alt="">
-
+          <img class="film-details__poster-img" src="${data.poster}" alt="">
           <p class="film-details__age">${data.age}</p>
         </div>
-
         <div class="film-details__info">
           <div class="film-details__info-head">
             <div class="film-details__title-wrap">
               <h3 class="film-details__title">${data.title}</h3>
               <p class="film-details__title-original">Original: ${data.origin}</p>
             </div>
-
             <div class="film-details__rating">
               <p class="film-details__total-rating">${data.rating}</p>
             </div>
           </div>
-
           <table class="film-details__table">
             <tr class="film-details__row">
               <td class="film-details__term">Director</td>
@@ -68,62 +67,54 @@ const createInfoTemplate =(data) => {
             </tr>
             <tr class="film-details__row">
               <td class="film-details__term">Writers</td>
-              <td class="film-details__cell">${data.writers}</td>
+              <td class="film-details__cell">${data.writers.join(', ')}</td>
             </tr>
             <tr class="film-details__row">
               <td class="film-details__term">Actors</td>
-              <td class="film-details__cell">${data.actors}</td>
+              <td class="film-details__cell">${data.actors.join(', ')}</td>
             </tr>
             <tr class="film-details__row">
               <td class="film-details__term">Release Date</td>
-              <td class="film-details__cell">${data.year}</td>
+              <td class="film-details__cell">${dayjs(data.year).format('DD MMMM YYYY')}</td>
             </tr>
             <tr class="film-details__row">
               <td class="film-details__term">Runtime</td>
-              <td class="film-details__cell">${data.duration}</td>
+              <td class="film-details__cell">${dayjs.duration(data.duration, 'm').format('H[h] mm[m]')}</td>
             </tr>
             <tr class="film-details__row">
               <td class="film-details__term">Country</td>
               <td class="film-details__cell">${data.country}</td>
             </tr>
             <tr class="film-details__row">
-              <td class="film-details__term">Genres</td>
+              <td class="film-details__term">${data.genre.length > 1 ? 'Genres' : 'Genre'}</td>
               <td class="film-details__cell">
                 ${createTemplateFromArray(data.genre, createGenreTemplate)}
             </tr>
           </table>
-
           <p class="film-details__film-description">
             ${data.description}
           </p>
         </div>
       </div>
-
       <section class="film-details__controls">
         <button type="button" class="film-details__control-button film-details__control-button--watchlist ${addToWatchClassName}" id="watchlist" name="watchlist">Add to watchlist</button>
         <button type="button" class="film-details__control-button ${watchedClassName} film-details__control-button--watched" id="watched" name="watched">Already watched</button>
         <button type="button" class="film-details__control-button film-details__control-button--favorite ${favoriteClassName}" id="favorite" name="favorite">Add to favorites</button>
       </section>
     </div>
-
     <div class="film-details__bottom-container">
       <section class="film-details__comments-wrap">
         <h3 class="film-details__comments-title">Comments <span class="film-details__comments-count">${data.comments.length}</span></h3>
-
         <ul class="film-details__comments-list">
-          ${createTemplateFromArray(data.comments, createCommentTemplate)}
+          ${createCommentsListTemplate()}
         </ul>
-
         <div class="film-details__new-comment">
           <div class="film-details__add-emoji-label">
           ${isEmoji !== '' ? `<img src="images/emoji/${isEmoji}.png" width="55" height="55" alt="emoji-${isEmoji}">` : ''}
-
 </div>
-
           <label class="film-details__comment-label">
-            <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment">${he.encode(message)}</textarea>
+            <textarea class="film-details__comment-input" placeholder="Select reaction below and write comment here" name="comment" ${isDisabled ? 'disabled' : ''}>${he.encode(message)}</textarea>
           </label>
-
           <div class="film-details__emoji-list">
             ${createTemplateFromArray(EMOJIES, createEmojiTemplate)}
           </div>
@@ -144,7 +135,11 @@ export default class InfoView extends SmartView {
   }
 
   get template() {
-    return createInfoTemplate(this._data);
+    return createInfoTemplate(this._data, this._comments);
+  }
+
+  get filmData() {
+    return this._data.film;
   }
 
   setClickHandler = (callback) => {
@@ -178,6 +173,9 @@ export default class InfoView extends SmartView {
     if (evt.target.dataset.comment) {
       const commentId = evt.target.dataset.comment;
       this._callback.deleteClick(commentId);
+      const deleteButton = document.querySelector(`[data-comment="${commentId}"]`);
+      deleteButton.disabled = true;
+      deleteButton.textContent = 'Deleting...';
     }
   }
 
@@ -223,16 +221,13 @@ export default class InfoView extends SmartView {
   }
 
   #commentFormKeydownHandler = (evt) => {
-    if (evt.key === 'Enter') {
+    if (evt.key === Key.ENTER) {
       if (!this._data.isEmoji || !this._data.message) {
         return;
       }
       const newComment = {
-        id: nanoid(),
         text: this._data.message,
         emoji: this._data.isEmoji,
-        author: 'Автор',
-        date: dayjs(Date.now()).format('YYYY/MM/DD HH:mm'),
       };
       this._callback.formSubmit(newComment);
     }
@@ -241,7 +236,9 @@ export default class InfoView extends SmartView {
   static parseFilmToData = (film) => ({...film,
     isEmoji: '',
     isEmojiChecked: '',
-    message: ''
+    message: '',
+    isDisabled: false,
+    isDeleting: false,
   });
 
   static parseDataToFilm = (data) => {
@@ -253,6 +250,8 @@ export default class InfoView extends SmartView {
     delete film.isEmoji;
     delete film.isEmojiChecked;
     delete film.message;
+    delete film.isDisabled;
+    delete film.isDeleting;
     return film;
   }
 }
