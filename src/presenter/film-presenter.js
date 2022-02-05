@@ -16,7 +16,6 @@ import ApiService from '../api-service';
 
 export default class FilmPresenter {
   #container = null;
-  #siteFooterTemplate = null;
 
   #infoComponent = null;
   #cardComponent = null;
@@ -32,7 +31,6 @@ export default class FilmPresenter {
   constructor(container, changeData, currentFilter) {
     this.#container = container;
     this.#changeData = changeData;
-    this.#siteFooterTemplate = document.querySelector('.footer');
     this.#currentFilter = currentFilter;
     this.#api = new ApiService(END_POINT, AUTHORIZATION);
 
@@ -109,17 +107,17 @@ export default class FilmPresenter {
     document.body.classList.remove('hide-overflow');
   };
 
-  #onEscKeyDown = (evt) => {
+  #handleEscKeyDown = (evt) => {
     if (evt.key === Key.ESCAPE || evt.key === Key.ESC) {
       evt.preventDefault();
       this.#removePopup();
-      document.removeEventListener('keydown', this.#onEscKeyDown);
+      document.removeEventListener('keydown', this.#handleEscKeyDown);
     }
   };
 
   #closePopup = () => {
     this.#removePopup();
-    document.removeEventListener('keydown', this.#onEscKeyDown);
+    document.removeEventListener('keydown', this.#handleEscKeyDown);
     this.#handleModelEvent(UserAction.CLOSE_POPUP);
   }
 
@@ -130,7 +128,7 @@ export default class FilmPresenter {
     this.#setInfoPopupComponentHandlers();
     document.body.appendChild(this.#infoComponent.element);
     document.body.classList.add('hide-overflow');
-    document.addEventListener('keydown', this.#onEscKeyDown);
+    document.addEventListener('keydown', this.#handleEscKeyDown);
   }
 
   #setCardComponentHandlers = () => {
@@ -156,7 +154,7 @@ export default class FilmPresenter {
       case ButtonStatus.WATCHED:
         this.#changeData(
           UserAction.UPDATE_FILM,
-          this.#currentFilter !== FilterType.HISTORY ? UpdateType.PATCH : UpdateType.MINOR,
+          this.#currentFilter !== FilterType.HISTORY ? UpdateType.ADD_WATCHED : UpdateType.MINOR,
           {...this.#film, isWatched: !this.#film.isWatched});
         break;
       case ButtonStatus.FAVORITE:
@@ -199,7 +197,7 @@ export default class FilmPresenter {
       case UserAction.DELETE_COMMENT:
         this.#changeData(
           UserAction.DELETE_COMMENT, UpdateType.PATCH,
-          { ...this.#film, comments: this.#film.comments.filter((comment) => comment.id !== data) });
+          { ...this.#film, comments: this.#film.comments.filter((comment) => comment !== data.toString()) });
         break;
       case UserAction.CLOSE_POPUP:
         if (this.#currentFilter !== FilterType.ALL) {

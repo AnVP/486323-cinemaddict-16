@@ -2,9 +2,7 @@ import AbstractView from '../view/abstract-view';
 
 export const createTemplateFromArray = (array, cb) => array.map((item) => cb(item)).join('');
 
-export function addUpperCaseFirst(str) {
-  return str[0].toUpperCase() + str.slice(1);
-}
+export const addUpperCaseFirst = (str) => str[0].toUpperCase() + str.slice(1);
 
 export const replace = (newElement, oldElement) => {
   if (newElement === null || oldElement === null) {

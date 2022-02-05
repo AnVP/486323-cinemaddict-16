@@ -106,16 +106,23 @@ const createStatFilterTemplate = (filter, currentFilterType) => {
       <label for="statistic-${type}" class="statistic__filters-label">${name}</label>`;
 };
 
+const createRankTemplate = (arr) => {
+  if (arr.length) {
+    return (`<p class="statistic__rank">
+      Your rank
+      <img class="statistic__img" src="images/bitmap@2x.png" alt="Avatar" width="35" height="35">
+      <span class="statistic__rank-label">${getRank(arr)}</span>
+    </p>`);
+  } else {
+    return ('');
+  }
+};
+
 const createStatisticsTemplate = (films, watchedFilms, filters, currentFilterType) => {
   const createFilterTemplate = filters.map((item) => createStatFilterTemplate(item, currentFilterType)).join('');
 
   return `<section class="statistic">
-    <p class="statistic__rank">
-      Your rank
-      <img class="statistic__img" src="images/bitmap@2x.png" alt="Avatar" width="35" height="35">
-      <span class="statistic__rank-label">${getRank(watchedFilms)}</span>
-    </p>
-
+    ${createRankTemplate(watchedFilms)}
     <form action="https://echo.htmlacademy.ru/" method="get" class="statistic__filters">
       <p class="statistic__filters-description">Show stats:</p>
       ${createFilterTemplate}

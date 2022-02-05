@@ -29,6 +29,8 @@ export const RankRating = {
   MOVIE_BUFF: 21,
 };
 
+const TIME_SEC = 60;
+
 const StatsTime = {
   TODAY: dayjs().toDate(),
   WEEK: dayjs().subtract(1, 'week').toDate(),
@@ -47,8 +49,8 @@ export const filterStatistic = {
 export const getTotalDuration = (films) => films.map((film) => film.duration).reduce((a, b) => a + b, 0);
 
 export const durationFormat = (min) => ({
-  hour: Math.trunc(min / 60),
-  min: min % 60,
+  hour: Math.trunc(min / TIME_SEC),
+  min: min % TIME_SEC,
 });
 
 export const getGenres = (films) => {
@@ -75,15 +77,17 @@ export const getTopGenre = (films) => {
 };
 
 export const getRank = (films) => {
+  let title = '';
   const count = films.length;
   if (!films.length) {
-    return;
+    return title;
   }
   if (count >= RankRating.NOVICE.MIN && count <= RankRating.NOVICE.MAX) {
-    return TitleRank.NOVICE;
+    title = TitleRank.NOVICE;
   } else if (count >= RankRating.FAN.MIN && count <= RankRating.FAN.MAX) {
-    return TitleRank.FAN;
-  } else {
-    return TitleRank.MOVIE_BUFF;
+    title = TitleRank.FAN;
+  } else if (count >= RankRating.MOVIE_BUFF) {
+    title = TitleRank.MOVIE_BUFF;
   }
+  return title;
 };

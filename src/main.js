@@ -7,13 +7,17 @@ import FilterPresenter from './presenter/filter-presenter';
 import StatisticsView from './view/statistics-view';
 import {AUTHORIZATION, END_POINT, MenuItem} from './utils/constants';
 import ApiService from './api-service';
+import FooterStatisticsView from './view/footer-statistics-view';
 
 const filmsModel = new FilmsModel(new ApiService(END_POINT, AUTHORIZATION));
 const filterModel = new FilterModel();
 const siteHeaderElement = document.querySelector('.header');
+render(siteHeaderElement, new ProfileView(), RenderPosition.BEFOREEND);
+const profileElement = document.querySelector('.header__profile');
 const siteMainElement = document.querySelector('.main');
+const siteFooterElement = document.querySelector('.footer');
 const filterPresenter = new FilterPresenter(siteMainElement, filterModel, filmsModel);
-const filmsListPresenter = new FilmsListPresenter(siteMainElement, filmsModel, filterModel);
+const filmsListPresenter = new FilmsListPresenter(siteMainElement, filmsModel, filterModel, profileElement);
 
 let statisticsComponent = null;
 
@@ -40,6 +44,6 @@ const handleSiteMenuClick = (menuItem) => {
 filterPresenter.init(handleSiteMenuClick, MenuItem.FILMS);
 filmsListPresenter.init();
 filmsModel.init().finally(() => {
-  render(siteHeaderElement, new ProfileView(filmsModel.films), RenderPosition.BEFOREEND);
   filterPresenter.setMenuClickHandler();
+  render(siteFooterElement, new FooterStatisticsView(filmsModel.films.length), RenderPosition.BEFOREEND);
 });

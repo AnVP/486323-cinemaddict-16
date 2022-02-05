@@ -25,7 +25,6 @@ export default class CommentsModel extends AbstractObservable {
   addComment = async (actionType, filmId, update) => {
     try {
       const response = await this.#apiService.addComment(filmId, update);
-      // const newComment = this.#adaptToClient(response);
       this.#comments = response.comments.map(this.#adaptToClient);
       this._notify(actionType, response);
     } catch(err) {

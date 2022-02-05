@@ -35,6 +35,7 @@ export const UpdateType = {
   MINOR: 'MINOR',
   MAJOR: 'MAJOR',
   INIT: 'INIT',
+  ADD_WATCHED: 'ADD_WATCHED',
 };
 
 export const FilterType = {
