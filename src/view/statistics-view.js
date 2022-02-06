@@ -4,13 +4,28 @@ import SmartView from './smart-view';
 import {
   durationFormat,
   filterStatistic,
-  getGenres,
+  getGenres, getRank,
   getTopGenre,
   getTotalDuration,
   StatisticFilterType
 } from '../utils/statistics';
 
 const BAR_HEIGHT = 50;
+const ChartType = {
+  HORIZONTAL: 'horizontalBar',
+};
+const DataChart = {
+  BACKGROUND_COLOR: '#ffe800',
+  HOVER_BACKGROUND_COLOR: '#ffe800',
+  ANCHOR: 'start',
+  BAR_THICKNESS: 24,
+  FONT: {
+    SIZE: 20,
+  },
+  COLOR: '#ffffff',
+  OFFSET: 40,
+  PADDING: 100
+};
 
 const renderChart = (statisticCtx, films) => {
   statisticCtx.height = BAR_HEIGHT * 5;
@@ -27,15 +42,15 @@ const renderChart = (statisticCtx, films) => {
 
   return  new Chart(statisticCtx, {
     plugins: [ChartDataLabels],
-    type: 'horizontalBar',
+    type: ChartType.HORIZONTAL,
     data: {
       labels: genres,
       datasets: [{
         data: genresCounts,
-        backgroundColor: '#ffe800',
-        hoverBackgroundColor: '#ffe800',
-        anchor: 'start',
-        barThickness: 24,
+        backgroundColor: DataChart.BACKGROUND_COLOR,
+        hoverBackgroundColor: DataChart.HOVER_BACKGROUND_COLOR,
+        anchor: DataChart.ANCHOR,
+        barThickness: DataChart.BAR_THICKNESS,
       }],
     },
     options: {
@@ -43,20 +58,20 @@ const renderChart = (statisticCtx, films) => {
       plugins: {
         datalabels: {
           font: {
-            size: 20,
+            size: DataChart.FONT.SIZE,
           },
-          color: '#ffffff',
-          anchor: 'start',
-          align: 'start',
-          offset: 40,
+          color: DataChart.COLOR,
+          anchor: DataChart.ANCHOR,
+          align: DataChart.ANCHOR,
+          offset: DataChart.OFFSET,
         },
       },
       scales: {
         yAxes: [{
           ticks: {
-            fontColor: '#ffffff',
-            padding: 100,
-            fontSize: 20,
+            fontColor: DataChart.COLOR,
+            padding: DataChart.PADDING,
+            fontSize: DataChart.FONT.SIZE,
           },
           gridLines: {
             display: false,
@@ -91,16 +106,23 @@ const createStatFilterTemplate = (filter, currentFilterType) => {
       <label for="statistic-${type}" class="statistic__filters-label">${name}</label>`;
 };
 
+const createRankTemplate = (arr) => {
+  if (arr.length) {
+    return (`<p class="statistic__rank">
+      Your rank
+      <img class="statistic__img" src="images/bitmap@2x.png" alt="Avatar" width="35" height="35">
+      <span class="statistic__rank-label">${getRank(arr)}</span>
+    </p>`);
+  } else {
+    return ('');
+  }
+};
+
 const createStatisticsTemplate = (films, watchedFilms, filters, currentFilterType) => {
   const createFilterTemplate = filters.map((item) => createStatFilterTemplate(item, currentFilterType)).join('');
 
   return `<section class="statistic">
-    <p class="statistic__rank">
-      Your rank
-      <img class="statistic__img" src="images/bitmap@2x.png" alt="Avatar" width="35" height="35">
-      <span class="statistic__rank-label">Movie buff</span>
-    </p>
-
+    ${createRankTemplate(watchedFilms)}
     <form action="https://echo.htmlacademy.ru/" method="get" class="statistic__filters">
       <p class="statistic__filters-description">Show stats:</p>
       ${createFilterTemplate}
@@ -109,7 +131,7 @@ const createStatisticsTemplate = (films, watchedFilms, filters, currentFilterTyp
     <ul class="statistic__text-list">
       <li class="statistic__text-item">
         <h4 class="statistic__item-title">You watched</h4>
-        <p class="statistic__item-text">${watchedFilms.length} <span class="statistic__item-description">movies</span></p>
+        <p class="statistic__item-text">${films.length} <span class="statistic__item-description">movies</span></p>
       </li>
       <li class="statistic__text-item">
         <h4 class="statistic__item-title">Total duration</h4>
@@ -141,14 +163,14 @@ export default class StatisticsView extends SmartView {
     this.#films = films;
     this.#watchedFilms = this.#films.filter((film) => film.isWatched);
     this.#currentFilter = StatisticFilterType.ALL;
-    this.#filteredFilms = filterStatistic[this.#currentFilter][this.#watchedFilms];
+    this.#filteredFilms = filterStatistic[this.#currentFilter](this.#watchedFilms);
 
     this.setClickFiltersHandler();
     this.#setCharts();
   }
 
   get template() {
-    return createStatisticsTemplate(this.#films, this.#watchedFilms, this.filters, this.#currentFilter);
+    return createStatisticsTemplate(this.#filteredFilms, this.#watchedFilms, this.filters, this.#currentFilter);
   }
 
   get filters() {
@@ -181,8 +203,7 @@ export default class StatisticsView extends SmartView {
     this.#setCharts();
   }
 
-  setClickFiltersHandler = (callback) => {
-    this._callback.click = callback;
+  setClickFiltersHandler = () => {
     this.element.querySelector('.statistic__filters').addEventListener('change', this.#clickFiltersHandler);
   }
 
@@ -190,7 +211,7 @@ export default class StatisticsView extends SmartView {
     evt.preventDefault();
     if (evt.target.name === 'statistic-filter') {
       this.#currentFilter = evt.target.value;
-      this.#filteredFilms = filterStatistic[this.#currentFilter][this.#watchedFilms];
+      this.#filteredFilms = filterStatistic[this.#currentFilter](this.#watchedFilms);
       this.updateElement();
     }
   }
@@ -200,6 +221,6 @@ export default class StatisticsView extends SmartView {
       this.#chart = null;
     }
     const statisticChartContainer = this.element.querySelector('.statistic__chart');
-    this.#chart = renderChart(statisticChartContainer, this.#films);
+    this.#chart = renderChart(statisticChartContainer, this.#filteredFilms);
   }
 }

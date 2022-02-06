@@ -1,10 +1,10 @@
 import {addUpperCaseFirst} from '../utils/util';
-import {MenuItem} from '../utils/constants';
+import {FilterType, MenuItem} from '../utils/constants';
 import AbstractView from './abstract-view.js';
 
 const createFilterItemTemplate = (filter, currentFilterType, menuItem) => {
   const {type, name, count} = filter;
-  return (`<a href="#${type}" class="main-navigation__item ${type === currentFilterType && menuItem === MenuItem.FILMS ? 'main-navigation__item--active' : ''}" data-filter="${type}">${addUpperCaseFirst(name)} ${type === 'all' ? '' : `<span class="main-navigation__item-count">${count}</span></a>`} `
+  return (`<a href="#${type}" class="main-navigation__item ${type === currentFilterType && menuItem === MenuItem.FILMS ? 'main-navigation__item--active' : ''}" data-filter="${type}">${addUpperCaseFirst(name)} ${type === FilterType.ALL ? '' : `<span class="main-navigation__item-count">${count}</span></a>`} `
   );
 };
 

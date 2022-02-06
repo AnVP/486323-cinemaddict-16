@@ -56,8 +56,6 @@ export default class FilterPresenter {
     this.#handleMenuClick = handleMenuClick;
 
     this.#filterComponent = new FilterView(filters, this.#filterModel.filter, this.#menuItem);
-    this.#filterComponent.setFilterTypeChangeHandler(this.#handleFilterTypeChange);
-    this.#filterComponent.setMenuClickHandler(this.#handleMenuClick);
 
     if (prevFilterComponent === null) {
       render(this.#filterContainer, this.#filterComponent, RenderPosition.BEFOREEND);
@@ -68,8 +66,14 @@ export default class FilterPresenter {
     remove(prevFilterComponent);
   }
 
+  setMenuClickHandler = () => {
+    this.#filterComponent.setFilterTypeChangeHandler(this.#handleFilterTypeChange);
+    this.#filterComponent.setMenuClickHandler(this.#handleMenuClick);
+  }
+
   #handleModelEvent = () => {
     this.init(this.#handleMenuClick, this.#menuItem);
+    this.setMenuClickHandler();
   }
 
   #handleFilterTypeChange = (filterType) => {
