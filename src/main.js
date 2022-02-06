@@ -8,6 +8,7 @@ import StatisticsView from './view/statistics-view';
 import {AUTHORIZATION, END_POINT, MenuItem} from './utils/constants';
 import ApiService from './api-service';
 import FooterStatisticsView from './view/footer-statistics-view';
+import RankView from './view/rank-view';
 
 const filmsModel = new FilmsModel(new ApiService(END_POINT, AUTHORIZATION));
 const filterModel = new FilterModel();
@@ -20,11 +21,14 @@ const filterPresenter = new FilterPresenter(siteMainElement, filterModel, filmsM
 const filmsListPresenter = new FilmsListPresenter(siteMainElement, filmsModel, filterModel, profileElement);
 
 let statisticsComponent = null;
+let rankComponent = null;
+let rank = null;
 
 const handleSiteMenuClick = (menuItem) => {
   switch (menuItem) {
     case MenuItem.FILMS:
       remove(statisticsComponent);
+      remove(rankComponent);
       filterPresenter.init(handleSiteMenuClick, MenuItem.FILMS);
       filterPresenter.setMenuClickHandler();
       if (!siteMainElement.querySelector('.films')) {
@@ -32,11 +36,15 @@ const handleSiteMenuClick = (menuItem) => {
       }
       break;
     case MenuItem.STATISTICS:
+      rank = filmsModel.films.filter((film) => film.isWatched);
       filterPresenter.init(handleSiteMenuClick, MenuItem.STATISTICS);
       filterPresenter.setMenuClickHandler();
       filmsListPresenter.destroy();
+      remove(rankComponent);
       statisticsComponent = new StatisticsView(filmsModel.films);
+      rankComponent = new RankView(rank);
       render(siteMainElement, statisticsComponent, RenderPosition.BEFOREEND);
+      render(profileElement, rankComponent, RenderPosition.AFTERBEGIN);
       break;
   }
 };
