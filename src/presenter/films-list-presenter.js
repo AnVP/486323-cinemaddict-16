@@ -81,10 +81,11 @@ export default class FilmsListPresenter {
     }
     const films = this.films;
     const filmsCount = films.length;
-    if (filmsCount === 0) {
+    if (!films.length) {
       this.#renderNoFilms();
       return;
     }
+
     this.#renderRank();
     this.#renderSort();
     render(this.#filmsContainer, this.#filmsComponent, RenderPosition.BEFOREEND);
@@ -153,7 +154,7 @@ export default class FilmsListPresenter {
   #renderRank = () => {
     const rank = this.#filmsModel.films.filter((film) => film.isWatched);
     this.#rankComponent = new RankView(rank);
-    render(this.#profileContainer, this.#rankComponent, RenderPosition.AFTERBEGIN);
+    render(this.#profileContainer, this.#rankComponent, RenderPosition.BEFOREEND);
   }
 
   #handleViewAction = async (actionType, updateType, update) => {

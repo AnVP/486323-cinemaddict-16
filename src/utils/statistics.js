@@ -82,12 +82,16 @@ export const getRank = (films) => {
   if (!films.length) {
     return title;
   }
-  if (count >= RankRating.NOVICE.MIN && count <= RankRating.NOVICE.MAX) {
-    title = TitleRank.NOVICE;
-  } else if (count >= RankRating.FAN.MIN && count <= RankRating.FAN.MAX) {
-    title = TitleRank.FAN;
-  } else if (count >= RankRating.MOVIE_BUFF) {
-    title = TitleRank.MOVIE_BUFF;
+  switch (true) {
+    case (count >= RankRating.NOVICE.MIN && count <= RankRating.NOVICE.MAX):
+      title = TitleRank.NOVICE;
+      break;
+    case (count >= RankRating.FAN.MIN && count <= RankRating.FAN.MAX):
+      title = TitleRank.FAN;
+      break;
+    case (count >= RankRating.MOVIE_BUFF):
+      title = TitleRank.MOVIE_BUFF;
+      break;
   }
   return title;
 };

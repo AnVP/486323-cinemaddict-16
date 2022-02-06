@@ -1,9 +1,16 @@
 import AbstractView from './abstract-view.js';
 import {getRank} from '../utils/statistics';
 
-const createRankTemplate =(watchedFilms) => (
-  `<p class="profile__rating">${getRank(watchedFilms)}</p>`
-);
+const createRankTemplate =(watchedFilms) => {
+  if (watchedFilms.length) {
+    return (`<section class="header__profile profile">
+    <p class="profile__rating">${getRank(watchedFilms)}</p>
+    <img class="profile__avatar" src="images/bitmap@2x.png" alt="Avatar" width="35" height="35">
+  </section>`);
+  } else {
+    return ('<section class="header__profile profile"></section>');
+  }
+};
 
 export default class RankView extends AbstractView {
   #watchedFilms = null;
