@@ -1,36 +1,39 @@
-export const Key = {
-  ENTER: 'Enter',
-  ESCAPE: 'Escape',
-  ESC: 'Esc'
-};
+const AUTHORIZATION = 'Basic ljsflsjflshfl';
+const END_POINT = 'https://16.ecmascript.pages.academy/cinemaddict';
 
-export const EMOJIES = [
+const EMOJIES = [
   'smile',
   'sleeping',
   'puke',
   'angry',
 ];
 
-export const SortType = {
+const Key = {
+  ENTER: 'Enter',
+  ESCAPE: 'Escape',
+  ESC: 'Esc'
+};
+
+const SortType = {
   DEFAULT: 'default',
   DATE: 'date',
   RATING: 'rating',
 };
 
-export const ButtonStatus = {
+const ButtonStatus = {
   WATCHLIST: 'watchlist',
   WATCHED: 'watched',
   FAVORITE: 'favorite'
 };
 
-export const UserAction = {
+const UserAction = {
   UPDATE_FILM: 'UPDATE_FILM',
   ADD_COMMENT: 'ADD_COMMENT',
   DELETE_COMMENT: 'DELETE_COMMENT',
   CLOSE_POPUP: 'CLOSE_POPUP',
 };
 
-export const UpdateType = {
+const UpdateType = {
   PATCH: 'PATCH',
   MINOR: 'MINOR',
   MAJOR: 'MAJOR',
@@ -38,28 +41,40 @@ export const UpdateType = {
   ADD_WATCHED: 'ADD_WATCHED',
 };
 
-export const FilterType = {
+const FilterType = {
   ALL: 'all',
   WATCHLIST: 'watchlist',
   HISTORY: 'history',
   FAVORITES: 'favorites',
 };
 
-export const MenuItem = {
+const MenuItem = {
   FILMS: 'FILMS',
   STATISTICS: 'STATISTICS',
 };
 
-export const AUTHORIZATION = 'Basic ljsflsjflshfl';
-export const END_POINT = 'https://16.ecmascript.pages.academy/cinemaddict';
-
-export const Mode = {
+const Mode = {
   DEFAULT: 'DEFAULT',
   POPUP: 'POPUP',
 };
 
-export const State = {
+const State = {
   SAVING: 'SAVING',
   DELETING: 'DELETING',
   ABORTING: 'ABORTING',
+};
+
+export {
+  Key,
+  EMOJIES,
+  SortType,
+  ButtonStatus,
+  UserAction,
+  UpdateType,
+  FilterType,
+  MenuItem,
+  AUTHORIZATION,
+  END_POINT,
+  Mode,
+  State
 };

@@ -2,7 +2,7 @@ import {createElement} from '../utils/render';
 const SHAKE_ANIMATION_TIMEOUT = 600;
 const COUNT = 1000;
 
-export default class AbstractView {
+class AbstractView {
   #element = null;
   _callback = {};
 
@@ -36,3 +36,5 @@ export default class AbstractView {
     }, SHAKE_ANIMATION_TIMEOUT);
   }
 }
+
+export default AbstractView;

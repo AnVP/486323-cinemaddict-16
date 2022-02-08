@@ -50,10 +50,12 @@ export default class FilmsListPresenter {
     const filteredFilms = filter[this.#filterType](films);
 
     switch (this.#currentSortType) {
-      case SortType.DATE:
+      case SortType.DATE: {
         return filteredFilms.sort(sortDate);
-      case SortType.RATING:
+      }
+      case SortType.RATING: {
         return filteredFilms.sort(sortRating);
+      }
     }
     return filteredFilms;
   }
@@ -159,44 +161,53 @@ export default class FilmsListPresenter {
 
   #handleViewAction = async (actionType, updateType, update) => {
     switch (actionType) {
-      case UserAction.UPDATE_FILM:
+      case UserAction.UPDATE_FILM: {
         this.#filmsModel.updateFilm(updateType, update);
         break;
-      case UserAction.ADD_COMMENT:
+      }
+      case UserAction.ADD_COMMENT: {
         this.#filmsModel.updateFilm(updateType, update);
         break;
-      case UserAction.DELETE_COMMENT:
+      }
+      case UserAction.DELETE_COMMENT: {
         this.#filmsModel.updateFilm(updateType, update);
         break;
-      case UserAction.CLOSE_POPUP:
+      }
+      case UserAction.CLOSE_POPUP: {
         this.#filmsModel.updateFilm(updateType, update);
         break;
+      }
     }
   }
 
   #handleModelEvent = (updateType, data) => {
     switch (updateType) {
-      case UpdateType.PATCH:
+      case UpdateType.PATCH: {
         this.#filmPresenter.get(data.id).init(data);
         break;
-      case UpdateType.MINOR:
+      }
+      case UpdateType.MINOR: {
         this.#clearBoard();
         this.#renderFilmsList();
         break;
-      case UpdateType.MAJOR:
+      }
+      case UpdateType.MAJOR: {
         this.#clearBoard({resetRenderedFilmCount: true, resetSortType: true});
         this.#renderFilmsList();
         break;
-      case UpdateType.ADD_WATCHED:
+      }
+      case UpdateType.ADD_WATCHED: {
         this.#filmPresenter.get(data.id).init(data);
         remove(this.#rankComponent);
         this.#renderRank();
         break;
-      case UpdateType.INIT:
+      }
+      case UpdateType.INIT: {
         this.#isLoading = false;
         remove(this.#loadingComponent);
         this.#renderFilmsList();
         break;
+      }
     }
   }
 

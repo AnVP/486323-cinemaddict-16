@@ -22,7 +22,7 @@ const createFilterTemplate = (filters, currentFilterType, menuItem) => {
   );
 };
 
-export default class FilterView extends AbstractView {
+class FilterView extends AbstractView {
   #filters = null;
   #currentFilter = null;
   #menuItem = null;
@@ -65,3 +65,5 @@ export default class FilterView extends AbstractView {
     this._callback.menuClick(evt.target.value);
   }
 }
+
+export default FilterView;

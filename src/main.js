@@ -23,7 +23,7 @@ let rankComponent = null;
 
 const handleSiteMenuClick = (menuItem) => {
   switch (menuItem) {
-    case MenuItem.FILMS:
+    case MenuItem.FILMS: {
       remove(statisticsComponent);
       remove(rankComponent);
       filmsListPresenter.destroy();
@@ -33,7 +33,8 @@ const handleSiteMenuClick = (menuItem) => {
         filmsListPresenter.init();
       }
       break;
-    case MenuItem.STATISTICS:
+    }
+    case MenuItem.STATISTICS: {
       rank = filmsModel.films.filter((film) => film.isWatched);
       filterPresenter.init(handleSiteMenuClick, MenuItem.STATISTICS);
       filterPresenter.setMenuClickHandler();
@@ -44,6 +45,7 @@ const handleSiteMenuClick = (menuItem) => {
       render(siteMainElement, statisticsComponent, RenderPosition.BEFOREEND);
       render(siteHeaderElement, rankComponent, RenderPosition.BEFOREEND);
       break;
+    }
   }
 };
 

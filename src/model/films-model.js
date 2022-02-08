@@ -1,7 +1,7 @@
 import AbstractObservable from '../utils/abstract-observable.js';
 import {UpdateType} from '../utils/constants';
 
-export default class FilmsModel extends AbstractObservable {
+class FilmsModel extends AbstractObservable {
   #apiService = null;
   #films = [];
 
@@ -83,3 +83,5 @@ export default class FilmsModel extends AbstractObservable {
     return adaptedFilm;
   }
 }
+
+export default FilmsModel;

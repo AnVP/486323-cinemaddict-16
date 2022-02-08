@@ -126,7 +126,7 @@ const createInfoTemplate =(data, comments) => {
 `;
 };
 
-export default class InfoView extends SmartView {
+class InfoView extends SmartView {
   constructor(film, comments) {
     super();
     this._data = InfoView.parseFilmToData(film);
@@ -255,3 +255,5 @@ export default class InfoView extends SmartView {
     return film;
   }
 }
+
+export default InfoView;

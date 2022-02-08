@@ -1,6 +1,6 @@
 import AbstractObservable from '../utils/abstract-observable.js';
 
-export default class CommentsModel extends AbstractObservable {
+class CommentsModel extends AbstractObservable {
   #comments = new Map;
   #apiService = null;
 
@@ -62,3 +62,5 @@ export default class CommentsModel extends AbstractObservable {
     return adaptedComment;
   }
 }
+
+export default CommentsModel;

@@ -14,7 +14,7 @@ import {
 import CommentsModel from '../model/comments-model';
 import ApiService from '../api-service';
 
-export default class FilmPresenter {
+class FilmPresenter {
   #container = null;
 
   #infoComponent = null;
@@ -83,20 +83,23 @@ export default class FilmPresenter {
     };
 
     switch (state) {
-      case State.SAVING:
+      case State.SAVING: {
         this.#infoComponent.updateData({
           isDisabled: true,
         });
         break;
-      case State.DELETING:
+      }
+      case State.DELETING: {
         this.#infoComponent.updateData({
           isDisabled: true,
           isDeleting: true,
         });
         break;
-      case State.ABORTING:
+      }
+      case State.ABORTING: {
         this.#infoComponent.shake(resetFormState);
         break;
+      }
     }
   }
 
@@ -145,30 +148,33 @@ export default class FilmPresenter {
 
   #handleAddToButtonsControlClick = (value) => {
     switch (value) {
-      case ButtonStatus.WATCHLIST:
+      case ButtonStatus.WATCHLIST: {
         this.#changeData(
           UserAction.UPDATE_FILM,
           this.#currentFilter !== FilterType.WATCHLIST ? UpdateType.PATCH : UpdateType.MINOR,
           {...this.#film, isAddToWatchList: !this.#film.isAddToWatchList});
         break;
-      case ButtonStatus.WATCHED:
+      }
+      case ButtonStatus.WATCHED: {
         this.#changeData(
           UserAction.UPDATE_FILM,
           this.#currentFilter !== FilterType.HISTORY ? UpdateType.ADD_WATCHED : UpdateType.MINOR,
           {...this.#film, isWatched: !this.#film.isWatched});
         break;
-      case ButtonStatus.FAVORITE:
+      }
+      case ButtonStatus.FAVORITE: {
         this.#changeData(
           UserAction.UPDATE_FILM,
           (this.#currentFilter !== FilterType.FAVORITES) || (this.#mode === Mode.POPUP) ? UpdateType.PATCH : UpdateType.MINOR,
           {...this.#film, isFavorite: !this.#film.isFavorite});
         break;
+      }
     }
   }
 
   #handleViewAction = async (actionType, update) => {
     switch (actionType) {
-      case UserAction.ADD_COMMENT:
+      case UserAction.ADD_COMMENT: {
         this.setViewState(State.SAVING);
         try {
           await this.#commentsModel.addComment(actionType, this.#film.id, update);
@@ -176,7 +182,8 @@ export default class FilmPresenter {
           this.setViewState(State.ABORTING, update);
         }
         break;
-      case UserAction.DELETE_COMMENT:
+      }
+      case UserAction.DELETE_COMMENT: {
         this.setViewState(State.DELETING, update);
         try {
           await this.#commentsModel.deleteComment(actionType, update);
@@ -184,27 +191,31 @@ export default class FilmPresenter {
           this.setViewState(State.ABORTING);
         }
         break;
+      }
     }
   }
 
   #handleModelEvent = (actionType, data) => {
     switch (actionType) {
-      case UserAction.ADD_COMMENT:
+      case UserAction.ADD_COMMENT: {
         this.#changeData(
           UserAction.ADD_COMMENT, UpdateType.PATCH,
           { ...this.#film, comments: data.comments.map((comment) => comment.id) });
         break;
-      case UserAction.DELETE_COMMENT:
+      }
+      case UserAction.DELETE_COMMENT: {
         this.#changeData(
           UserAction.DELETE_COMMENT, UpdateType.PATCH,
           { ...this.#film, comments: this.#film.comments.filter((comment) => comment !== data.toString()) });
         break;
-      case UserAction.CLOSE_POPUP:
+      }
+      case UserAction.CLOSE_POPUP: {
         if (this.#currentFilter !== FilterType.ALL) {
           this.#changeData(
             UserAction.CLOSE_POPUP, UpdateType.MINOR,
             { ...this.#film });
         }
+      }
     }
   }
 
@@ -223,3 +234,5 @@ export default class FilmPresenter {
     }
   }
 }
+
+export default FilmPresenter;

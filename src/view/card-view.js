@@ -36,7 +36,7 @@ const createCardTemplate =(film) => {
         </article>`;
 };
 
-export default class CardView extends AbstractView {
+class CardView extends AbstractView {
   #film = null;
 
   constructor(film) {
@@ -68,3 +68,5 @@ export default class CardView extends AbstractView {
     this.element.querySelector('.film-card__controls-item--favorite').addEventListener('click', this.#buttonsClickHandler(ButtonStatus.FAVORITE));
   }
 }
+
+export default CardView;

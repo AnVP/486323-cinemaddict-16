@@ -7,7 +7,7 @@ const Method = {
   DELETE: 'DELETE',
 };
 
-export default class ApiService {
+class ApiService {
   #endPoint = null;
   #authorization = null;
   #filmId = null;
@@ -156,3 +156,5 @@ export default class ApiService {
     throw err;
   }
 }
+
+export default ApiService;

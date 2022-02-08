@@ -106,16 +106,15 @@ const createStatFilterTemplate = (filter, currentFilterType) => {
       <label for="statistic-${type}" class="statistic__filters-label">${name}</label>`;
 };
 
-const createRankTemplate = (arr) => {
-  if (arr.length) {
+const createRankTemplate = (films) => {
+  if (films.length) {
     return (`<p class="statistic__rank">
       Your rank
       <img class="statistic__img" src="images/bitmap@2x.png" alt="Avatar" width="35" height="35">
-      <span class="statistic__rank-label">${getRank(arr)}</span>
+      <span class="statistic__rank-label">${getRank(films)}</span>
     </p>`);
-  } else {
-    return ('');
   }
+  return ('');
 };
 
 const createStatisticsTemplate = (films, watchedFilms, filters, currentFilterType) => {
@@ -150,7 +149,7 @@ const createStatisticsTemplate = (films, watchedFilms, filters, currentFilterTyp
   </section>`;
 };
 
-export default class StatisticsView extends SmartView {
+class StatisticsView extends SmartView {
   #chart = null;
   #films = null;
   #watchedFilms = null;
@@ -224,3 +223,5 @@ export default class StatisticsView extends SmartView {
     this.#chart = renderChart(statisticChartContainer, this.#filteredFilms);
   }
 }
+
+export default StatisticsView;

@@ -15,7 +15,7 @@ const createNoFilmTemplate = (filterType) => {
    </h2>`);
 };
 
-export default class NoFilmsView extends AbstractView {
+class NoFilmsView extends AbstractView {
   constructor(data) {
     super();
     this._data = data;
@@ -25,3 +25,5 @@ export default class NoFilmsView extends AbstractView {
     return createNoFilmTemplate(this._data);
   }
 }
+
+export default NoFilmsView;

@@ -4,7 +4,7 @@ import FilterView from '../view/filter-view';
 import {remove, render, RenderPosition} from '../utils/render';
 import {replace} from '../utils/util';
 
-export default class FilterPresenter {
+class FilterPresenter {
   #filterContainer = null;
   #filterModel = null;
   #filmsModel = null;
@@ -84,3 +84,5 @@ export default class FilterPresenter {
     this.#filterModel.setFilter(UpdateType.MAJOR, filterType);
   }
 }
+
+export default FilterPresenter;

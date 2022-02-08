@@ -9,7 +9,7 @@ const createFiltersTemplate =(currentSortType) => (
   </ul>`
 );
 
-export default class SortView extends AbstractView {
+class SortView extends AbstractView {
   #currentSortType = null;
 
   constructor(currentSortType) {
@@ -35,3 +35,5 @@ export default class SortView extends AbstractView {
     this._callback.sortTypeChange(evt.target.dataset.sortType);
   }
 }
+
+export default SortView;

@@ -3,7 +3,9 @@ import isBetween from 'dayjs/plugin/isBetween';
 
 dayjs.extend(isBetween);
 
-export const StatisticFilterType = {
+const TIME_SEC = 60;
+
+const StatisticFilterType = {
   ALL: 'all-time',
   TODAY: 'today',
   WEEK: 'week',
@@ -11,13 +13,13 @@ export const StatisticFilterType = {
   YEAR: 'year'
 };
 
-export const TitleRank = {
+const TitleRank = {
   NOVICE: 'Novice',
   FAN: 'Fan',
   MOVIE_BUFF: 'Movie Buff',
 };
 
-export const RankRating = {
+const RankRating = {
   NOVICE: {
     MIN: 1,
     MAX: 10
@@ -29,8 +31,6 @@ export const RankRating = {
   MOVIE_BUFF: 21,
 };
 
-const TIME_SEC = 60;
-
 const StatsTime = {
   TODAY: dayjs().toDate(),
   WEEK: dayjs().subtract(1, 'week').toDate(),
@@ -38,7 +38,7 @@ const StatsTime = {
   YEAR: dayjs().subtract(1, 'year').toDate(),
 };
 
-export const filterStatistic = {
+const filterStatistic = {
   [StatisticFilterType.ALL]: (films) => films.filter((film) => film),
   [StatisticFilterType.TODAY]: (films) => films.filter((film) => dayjs(film.watchedDate).isSame(StatsTime.TODAY, 'day')),
   [StatisticFilterType.WEEK]: (films) => films.filter((film) => dayjs(film.watchedDate).isBetween(StatsTime.WEEK, StatsTime.TODAY)),
@@ -46,14 +46,14 @@ export const filterStatistic = {
   [StatisticFilterType.YEAR]: (films) => films.filter((film) => dayjs(film.watchedDate).isBetween(StatsTime.YEAR, StatsTime.TODAY)),
 };
 
-export const getTotalDuration = (films) => films.map((film) => film.duration).reduce((a, b) => a + b, 0);
+const getTotalDuration = (films) => films.map((film) => film.duration).reduce((a, b) => a + b, 0);
 
-export const durationFormat = (min) => ({
+const durationFormat = (min) => ({
   hour: Math.trunc(min / TIME_SEC),
   min: min % TIME_SEC,
 });
 
-export const getGenres = (films) => {
+const getGenres = (films) => {
   const genres = {};
   films.map((film) => {
     film.genre.forEach((genre) => {
@@ -67,7 +67,7 @@ export const getGenres = (films) => {
   return genres;
 };
 
-export const getTopGenre = (films) => {
+const getTopGenre = (films) => {
   if (films.length === 0) {
     return '';
   }
@@ -76,22 +76,37 @@ export const getTopGenre = (films) => {
   return topGenre;
 };
 
-export const getRank = (films) => {
+const getRank = (films) => {
   let title = '';
   const count = films.length;
   if (!films.length) {
     return title;
   }
   switch (true) {
-    case (count >= RankRating.NOVICE.MIN && count <= RankRating.NOVICE.MAX):
+    case (count >= RankRating.NOVICE.MIN && count <= RankRating.NOVICE.MAX): {
       title = TitleRank.NOVICE;
       break;
-    case (count >= RankRating.FAN.MIN && count <= RankRating.FAN.MAX):
+    }
+    case (count >= RankRating.FAN.MIN && count <= RankRating.FAN.MAX): {
       title = TitleRank.FAN;
       break;
-    case (count >= RankRating.MOVIE_BUFF):
+    }
+    case (count >= RankRating.MOVIE_BUFF): {
       title = TitleRank.MOVIE_BUFF;
       break;
+    }
   }
   return title;
+};
+
+export {
+  StatisticFilterType,
+  TitleRank,
+  RankRating,
+  filterStatistic,
+  getTotalDuration,
+  durationFormat,
+  getGenres,
+  getTopGenre,
+  getRank
 };

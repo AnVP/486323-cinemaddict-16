@@ -7,8 +7,10 @@ const createCardListTemplate =() => (
   </section>`
 );
 
-export default class CardListView extends AbstractView {
+class CardListView extends AbstractView {
   get template() {
     return createCardListTemplate();
   }
 }
+
+export default CardListView;

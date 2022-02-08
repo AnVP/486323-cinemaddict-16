@@ -1,10 +1,10 @@
 import AbstractView from '../view/abstract-view';
 
-export const createTemplateFromArray = (array, cb) => array.map((item) => cb(item)).join('');
+const createTemplateFromArray = (data, cb) => data.map((item) => cb(item)).join('');
 
-export const addUpperCaseFirst = (str) => str[0].toUpperCase() + str.slice(1);
+const addUpperCaseFirst = (str) => str[0].toUpperCase() + str.slice(1);
 
-export const replace = (newElement, oldElement) => {
+const replace = (newElement, oldElement) => {
   if (newElement === null || oldElement === null) {
     throw new Error('Cannot replace unexisting elements');
   }
@@ -21,6 +21,13 @@ export const replace = (newElement, oldElement) => {
   parent.replaceChild(newChild, oldChild);
 };
 
-export const sortRating = (filmA, filmB) => filmB.rating - filmA.rating;
-export const sortComments = (filmA, filmB) => filmB.comments.length - filmA.comments.length;
-export const sortDate = (filmA, filmB) => filmB.year - filmA.year;
+const sortRating = (filmA, filmB) => filmB.rating - filmA.rating;
+const sortDate = (filmA, filmB) => filmB.year - filmA.year;
+
+export {
+  createTemplateFromArray,
+  addUpperCaseFirst,
+  replace,
+  sortRating,
+  sortDate
+};
