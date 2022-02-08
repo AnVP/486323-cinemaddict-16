@@ -1,6 +1,5 @@
 import dayjs from 'dayjs';
 import isBetween from 'dayjs/plugin/isBetween';
-
 dayjs.extend(isBetween);
 
 const TIME_SEC = 60;

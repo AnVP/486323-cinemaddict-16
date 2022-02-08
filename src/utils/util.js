@@ -1,6 +1,6 @@
 import AbstractView from '../view/abstract-view';
 
-const createTemplateFromArray = (data, cb) => data.map((item) => cb(item)).join('');
+const createTemplateFromArray = (items, cb) => items.map((item) => cb(item)).join('');
 
 const addUpperCaseFirst = (str) => str[0].toUpperCase() + str.slice(1);
 

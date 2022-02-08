@@ -13,7 +13,7 @@ import RankView from '../view/rank-view';
 
 const CARDS_COUNT_PER_STEP = 5;
 
-export default class FilmsListPresenter {
+class FilmsListPresenter {
   #filmsContainer = null;
   #filmListContainerElement = null;
   #profileContainer = null;
@@ -233,3 +233,5 @@ export default class FilmsListPresenter {
     this.#filterModel.removeObserver(this.#handleModelEvent);
   }
 }
+
+export default FilmsListPresenter;
